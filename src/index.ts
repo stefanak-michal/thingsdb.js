@@ -1,5 +1,5 @@
 import { encode, decode } from "messagepack";
-import WebSocket from 'ws';
+const WebSocketClient = require('websocket').w3cwebsocket;
 
 class ThingsDB {
     private ws: WebSocket;
@@ -8,40 +8,29 @@ class ThingsDB {
 
     constructor(uri: string = 'ws://127.0.0.1:9200') {
         this.uri = uri;
-        // this.ws.onopen = (event: Event) => {
-        //     console.log("WebSocket open: ", event);
-        // };
-        // todo create type T instead of any when you will learn more about message received from ThingsDB
-        // this.ws.onmessage = (event: MessageEvent<any>) => {
-        //     console.log("WebSocket message: ", event, decode(event.data));
-        // };
-        // this.ws.onerror = (event) => {
-        //     console.error("WebSocket error: ", event);
-        // };
-        // this.ws.onclose = (event) => {
-        //
-        // };
     }
 
     public connect() {
         return new Promise((resolve, reject) => {
-            this.ws = new WebSocket(this.uri);
-            this.ws.binaryType = "arraybuffer";
-            this.ws
-                .on("open", () => {
-                    console.log("WebSocket connected");
-                    resolve(true);
-                })
-                .on("close", () => {
-                    console.log("WebSocket closed");
-                })
-                .on("message", (data) => {
-                    console.log("WebSocket message: ", data);
-                })
-                .on("error", (error) => {
-                    console.error("WebSocket error: ", error);
-                    reject(error);
-                })
+            this.ws = new WebSocketClient(this.uri);
+            // this.ws.binaryType = "arraybuffer";
+            this.ws.onopen = (event) => {
+                console.log("WebSocket connected", event);
+                resolve(true);
+            }
+
+            this.ws.onclose = (event) => {
+                console.log("WebSocket closed", event);
+            }
+
+            this.ws.onmessage = (event) => {
+                console.log("WebSocket message: ", event);
+            }
+
+            this.ws.onerror = (event) => {
+                console.log("WebSocket error: ", event);
+                reject(event);
+            }
         })
     }
 
@@ -57,24 +46,38 @@ class ThingsDB {
         return id;
     }
 
-    public auth(username: string, password: string): Promise<any> {
+    public auth(username: string = 'admin', password: string = 'pass'): Promise<any> {
         return new Promise((resolve, reject) => {
             const id = this.send(33, [username, password]);
-            this.pending.push({ id, resolve, reject });
+            this.pending.push({ id: id, resolve: resolve, reject: reject });
         });
     }
 
-    private send(type: number, data: any) {
+    public ping(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const id = this.send(32);
+            this.pending.push({id: id, resolve: resolve, reject: reject});
+        });
+    }
+
+    private send(type: number, data: any = "") {
         const id = this.getNextId();
-        const message = encode(data);
-        const buffer = new ArrayBuffer(message.byteLength + 8);
-        new Uint8Array(buffer).set(message, 8);
+        let buffer: ArrayBuffer;
+        let messageLength: number = 0;
+        if (data === "") {
+            buffer = new ArrayBuffer(8);
+        } else {
+            const message = encode(data);
+            messageLength = message.byteLength;
+            buffer = new ArrayBuffer(messageLength + 8);
+            new Uint8Array(buffer).set(message, 8);
+        }
 
         const view = new DataView(buffer);
-        view.setUint32(0, message.byteLength, true);
+        view.setUint32(0, messageLength, true);
         view.setUint16(4, id, true);
-        view.setUint8(5, type);
-        view.setUint8(6, type ^ 0xff);
+        view.setUint8(6, type);
+        view.setUint8(7, type ^ 0xff);
 
         console.log("WebSocket send: ", view);
         this.ws.send(view);

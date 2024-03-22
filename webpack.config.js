@@ -6,6 +6,10 @@ const config = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'thingsdb.js',
+        library: 'ThingsDB',
+        libraryExport: 'default',
+        libraryTarget: 'umd',
+        globalObject: 'this',
     },
     module: {
         rules: [

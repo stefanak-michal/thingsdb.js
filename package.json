@@ -33,6 +33,6 @@
     "webpack-dev-server": "^5.0.4"
   },
   "dependencies": {
-    "ws": "^8.16.0"
+    "websocket": "^1.0.34"
   }
 }
