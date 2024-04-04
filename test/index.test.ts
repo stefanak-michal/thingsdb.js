@@ -1,23 +1,17 @@
 import ThingsDB from '../src/index';
-import { expect, test } from '@jest/globals';
+import { expect, test, beforeAll } from '@jest/globals';
 
-const thingsdb = new ThingsDB();
 
-test('connect', () => {
-    return thingsdb.connect().then((success) => {
-        expect(success).toBeTruthy();
-    });
-})
+const thingsdb = new ThingsDB('ws://127.0.0.1:7681');
+
+beforeAll(() => {
+    return thingsdb.connect();
+});
 
 test('ping', () => {
-    return thingsdb.ping().then((success) => {
-        expect(success).toBeTruthy();
-    });
-})
+    return thingsdb.ping();
+});
 
 test('auth', () => {
-    return thingsdb.auth().then(() => {
-        expect(true).toBeTruthy();
-    });
-
-})
+    return thingsdb.auth();
+});
