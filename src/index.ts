@@ -2,7 +2,7 @@ import { encode, decode } from "messagepack";
 const WebSocketClient = require('websocket').w3cwebsocket;
 
 class ThingsDB {
-    private ws: WebSocket;
+    private ws: typeof WebSocketClient;
     private id: number = 1;
     private readonly uri: string;
     private pending: { [index: number]: { resolve: (value: any) => void, reject: (value: any) => void }} = {};
@@ -15,21 +15,21 @@ class ThingsDB {
         return new Promise((resolve, reject) => {
             this.ws = new WebSocketClient(this.uri);
 
-            this.ws.onopen = (event) => {
+            this.ws.onopen = (event: Event) => {
                 console.log("WebSocket connected", event);
                 resolve(true);
             }
 
-            this.ws.onclose = (event) => {
+            this.ws.onclose = (event: CloseEvent) => {
                 console.log("WebSocket closed", event);
             }
 
-            this.ws.onmessage = (event) => {
+            this.ws.onmessage = (event: MessageEvent) => {
                 console.log("WebSocket message: ", event);
 
                 const view = new DataView(event.data);
                 const size = view.getUint32(0, true);
-                const id = view.getInt16(4, true);
+                const id = view.getUint16(4, true);
                 const type = view.getUint8(6);
                 const check = view.getUint8(7);
 
@@ -40,9 +40,7 @@ class ThingsDB {
 
                 let message: any = null;
                 if (size) {
-                    const buffer = new ArrayBuffer(size);
-                    new Uint8Array(buffer).set(event.data.subarray(8));
-                    message = decode(buffer);
+                    message = decode(event.data.slice(8));
                     console.log(message);
                 }
 
@@ -53,17 +51,20 @@ class ThingsDB {
                 }
             }
 
-            this.ws.onerror = (event) => {
+            this.ws.onerror = (event: ErrorEvent) => {
                 console.error("WebSocket error: ", event);
                 reject(event);
             }
         })
     }
 
-    // todo check if ThingsDB means unsigned short ..because here it say only 16bit https://docs.thingsdb.io/v1/connect/socket/
+    public disconnect(): void {
+        //todo
+    }
+
     private getNextId(): number {
         const id = this.id++;
-        if (this.id > 32767) {
+        if (this.id > 65535) {
             this.id = 1;
         }
         return id;
@@ -71,25 +72,35 @@ class ThingsDB {
 
     public auth(username: string = 'admin', password: string = 'pass'): Promise<any> {
         return new Promise((resolve, reject) => {
-            const id = this.send(33, [username, password]);
-            this.pending[id] = { resolve: resolve, reject: reject };
+            this.pending[this.send(33, [username, password])] = { resolve: resolve, reject: reject };
         });
+    }
+
+    public authToken(token: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(33, token)] = { resolve: resolve, reject: reject };
+        })
     }
 
     public ping(): Promise<any> {
         return new Promise((resolve, reject) => {
-            const id = this.send(32);
-            this.pending[id] = { resolve: resolve, reject: reject };
+            this.pending[this.send(32)] = { resolve: resolve, reject: reject };
         });
     }
 
-    //todo
-    //query
-    //run
-    //join
-    //leave
-    //emit
+    public query(scope: string, code: string, vars?: {}): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(34, [scope, code, vars])] = { resolve: resolve, reject: reject };
+        });
+    }
 
+    public run(scope: string, procedure: string, args?: any[]): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(37, [scope, procedure, args])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    //todo join, leave, emit
 
     private send(type: number, data: any = "") {
         const id = this.getNextId();
@@ -106,7 +117,7 @@ class ThingsDB {
 
         const view = new DataView(buffer);
         view.setUint32(0, size, true);
-        view.setInt16(4, id, true);
+        view.setUint16(4, id, true);
         view.setUint8(6, type);
         view.setUint8(7, ~type);
 
