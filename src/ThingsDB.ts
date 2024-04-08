@@ -1,4 +1,5 @@
 import { encode, decode } from "messagepack";
+import EventType from "./EventType";
 const WebSocketClient = require('websocket').w3cwebsocket;
 
 class ThingsDB {
@@ -6,8 +7,9 @@ class ThingsDB {
     private id: number = 1;
     private readonly uri: string;
     private pending: { [index: number]: { resolve: (value: any) => void, reject: (value: any) => void }} = {};
+    private listeners: ((type: number, message: any) => void)[] = [];
 
-    constructor(uri: string = 'ws://127.0.0.1:9200') {
+    constructor(uri: string = 'ws://127.0.0.1:7681') {
         this.uri = uri;
     }
 
@@ -16,17 +18,13 @@ class ThingsDB {
             this.ws = new WebSocketClient(this.uri);
 
             this.ws.onopen = (event: Event) => {
-                console.log("WebSocket connected", event);
                 resolve(true);
             }
 
             this.ws.onclose = (event: CloseEvent) => {
-                console.log("WebSocket closed", event);
             }
 
             this.ws.onmessage = (event: MessageEvent) => {
-                console.log("WebSocket message: ", event);
-
                 const view = new DataView(event.data);
                 const size = view.getUint32(0, true);
                 const id = view.getUint16(4, true);
@@ -41,13 +39,16 @@ class ThingsDB {
                 let message: any = null;
                 if (size) {
                     message = decode(event.data.slice(8));
-                    console.log(message);
                 }
 
                 if (id in this.pending) {
                     if (type === 19) this.pending[id].reject(message);
                     else this.pending[id].resolve(message);
                     delete this.pending[id];
+                } else if (type in EventType) {
+                    for (const callback of this.listeners) callback(type as EventType, message);
+                } else {
+                    console.error("Unregistered event type: ", type);
                 }
             }
 
@@ -59,7 +60,7 @@ class ThingsDB {
     }
 
     public disconnect(): void {
-        //todo
+        this.ws.close();
     }
 
     private getNextId(): number {
@@ -70,19 +71,19 @@ class ThingsDB {
         return id;
     }
 
-    public auth(username: string = 'admin', password: string = 'pass'): Promise<any> {
+    public auth(username: string = 'admin', password: string = 'pass'): Promise<void> {
         return new Promise((resolve, reject) => {
             this.pending[this.send(33, [username, password])] = { resolve: resolve, reject: reject };
         });
     }
 
-    public authToken(token: string): Promise<any> {
+    public authToken(token: string): Promise<void> {
         return new Promise((resolve, reject) => {
             this.pending[this.send(33, token)] = { resolve: resolve, reject: reject };
         })
     }
 
-    public ping(): Promise<any> {
+    public ping(): Promise<void> {
         return new Promise((resolve, reject) => {
             this.pending[this.send(32)] = { resolve: resolve, reject: reject };
         });
@@ -100,7 +101,32 @@ class ThingsDB {
         });
     }
 
-    //todo join, leave, emit
+    public join(scope: string, ...ids: number[]): Promise<(number|null)[]> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(38, [scope, ...ids])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    public leave(scope: string, ...ids: number[]): Promise<(number|null)[]> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(39, [scope, ...ids])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    public emit(scope: string, roomId: number, event: string, args: any[] = []): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(40, [scope, roomId, event, ...args])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    public addEventListener(callback: (type: EventType, message: any) => void): void {
+        this.listeners.push(callback);
+    }
+
+    public removeEventListener(callback: (type: EventType, message: any) => void): void {
+        const i = this.listeners.indexOf(callback);
+        if (i >= 0) this.listeners.splice(i, 1);
+    }
 
     private send(type: number, data: any = "") {
         const id = this.getNextId();
@@ -121,7 +147,7 @@ class ThingsDB {
         view.setUint8(6, type);
         view.setUint8(7, ~type);
 
-        console.log("WebSocket send: ", buffer);
+        // console.log("WebSocket send: ", buffer);
         this.ws.send(buffer);
 
         return id;
