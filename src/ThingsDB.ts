@@ -41,7 +41,7 @@ class ThingsDB {
                     message = decode(event.data.slice(8));
                 }
 
-                if (id in this.pending) {
+                if (type >= 16 && type <= 19 && id in this.pending) {
                     if (type === 19) this.pending[id].reject(message);
                     else this.pending[id].resolve(message);
                     delete this.pending[id];
