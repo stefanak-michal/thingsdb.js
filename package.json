@@ -2,6 +2,7 @@
   "name": "thingsdb.js",
   "version": "0.1.0",
   "description": "Javascript connector for ThingsDB",
+  "homepage": "https://github.com/stefanak-michal/thingsdb.js",
   "private": true,
   "main": "dist/thingsdb.js",
   "scripts": {
@@ -14,8 +15,22 @@
     "ThingsDB",
     "javascript"
   ],
-  "author": "Michal Stefanak",
+  "author": "Michal Stefanak (https://www.linkedin.com/in/michalstefanak/)",
+  "funding": [
+    {
+      "type" : "ko-fi",
+      "url" : "https://ko-fi.com/michalstefanak"
+    },
+    {
+      "type" : "github sponsors",
+      "url" : "https://github.com/sponsors/stefanak-michal"
+    }
+  ],
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stefanak-michal/thingsdb.js.git"
+  },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
     "@babel/core": "^7.24.3",
