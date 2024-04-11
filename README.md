@@ -1,4 +1,4 @@
-# JavaScript connector for ThingsDB
+# ThingsDB.js
 
 ## Description
 
@@ -6,4 +6,4 @@ This project provides a JavaScript connector library that enables seamless inter
 
 ## Status
 
-This project is currently under active development. We're continuously adding new features and improvements. Feel free to contribute or raise issues to help us shape this connector into a robust and valuable tool.
+This project is developed but it requires some polishing. It works for Node.js projects as in browser. Feel free to contribute or raise issues to help us shape this connector into a robust and valuable tool.
