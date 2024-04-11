@@ -16,6 +16,7 @@ class ThingsDB {
     public connect() {
         return new Promise((resolve, reject) => {
             this.ws = new WebSocketClient(this.uri);
+            this.ws.binaryType = "arraybuffer";
 
             this.ws.onopen = (event: Event) => {
                 resolve(true);
