@@ -2,10 +2,14 @@ const path = require('path');
 
 // Webpack Configuration
 const config = {
-    entry: path.resolve(__dirname, "src/index.ts"),
+    entry: path.resolve(__dirname, "src/ThingsDB.ts"),
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'thingsdb.js',
+        library: 'ThingsDB',
+        libraryExport: 'default',
+        libraryTarget: 'umd',
+        globalObject: 'this',
     },
     module: {
         rules: [
