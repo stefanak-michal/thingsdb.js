@@ -1,26 +1,4 @@
-# Use the latest Ubuntu image
-FROM ubuntu:22.04
-
-# Install build dependencies
-RUN apt-get update && \
-    apt-get install -y \
-        libuv1-dev \
-        libpcre2-dev \
-        libyajl-dev \
-        libcurl4-nss-dev \
-        build-essential \
-        git \
-        libwebsockets-dev
-
-# Switch to the lws branch
-RUN git clone --branch lws https://github.com/thingsdb/ThingsDB.git ThingsDB
-
-# Compile ThingsDB
-WORKDIR ThingsDB/Release
-RUN make clean && make
-
-# Copy the executable
-RUN cp thingsdb /usr/local/bin/thingsdb
+FROM ghcr.io/thingsdb/node:latest
 
 # Expose port (can be customized)
 EXPOSE 9200
