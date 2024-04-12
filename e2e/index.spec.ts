@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import EventType from "../src/EventType";
 
 test('perform ThingsDB test', async ({ page }) => {
     await page.goto('http://localhost:9000/');
@@ -24,10 +23,10 @@ test('perform ThingsDB test', async ({ page }) => {
 .test_room.id();`));
     expect(roomId).toBeGreaterThan(0);
 
-    const watchDog = page.waitForFunction(() => window["joined"], null, {timeout: 5});
+    const watchDog = page.waitForFunction(() => window["joined"] || false, null, {timeout: 5});
     await page.evaluate((r) => {
         window["joined"] = false;
-        window["thingsdb"].addEventListener((type: number, message: any): boolean => { window["joined"] = type === EventType.ON_JOIN; });
+        window["thingsdb"].addEventListener((type: number): void => { window["joined"] = type == 6; });
         return window["thingsdb"].join('@:stuff', r);
     }, roomId);
     await watchDog;
