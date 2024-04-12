@@ -70,7 +70,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'webpack-dev-server --mode production',
+    command: 'webpack-dev-server --mode production --no-open',
     url: 'http://127.0.0.1:9000',
     reuseExistingServer: !process.env.CI,
   },

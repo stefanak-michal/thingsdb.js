@@ -23,11 +23,28 @@ test('perform ThingsDB test', async ({ page }) => {
 .test_room.id();`));
     expect(roomId).toBeGreaterThan(0);
 
-    const watchDog = page.waitForFunction(() => window["joined"] || false, null, {timeout: 5});
+    let watchDog = page.waitForFunction(() => window["joined"] || false, null, {timeout: 5000});
     await page.evaluate((r) => {
         window["joined"] = false;
         window["thingsdb"].addEventListener((type: number): void => { window["joined"] = type == 6; });
         return window["thingsdb"].join('@:stuff', r);
     }, roomId);
     await watchDog;
+
+    watchDog = page.waitForFunction(() => window["emitted"] || false, null, {timeout: 5000});
+    const id = await page.evaluate(() => {
+        window["emitted"] = false;
+        window["thingsdb"].addEventListener((type: number, message: any): void => { window["emitted"] = (
+            type == 8
+            && message.event === "test-event"
+            && message.args.toString() === 'Testing event'
+        ); });
+        return window["thingsdb"].query('@:stuff', `task(
+    datetime().move("seconds", 2), 
+    || .test_room.emit("test-event", "Testing event")
+).id();`)
+    });
+    expect(id).toBeGreaterThan(0);
+    await watchDog;
+
 });
