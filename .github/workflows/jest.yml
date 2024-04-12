@@ -1,4 +1,4 @@
-name: CI
+name: Jest Tests
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Docker build
         run: docker build -t thingsdb . -f ci/thingsdb.Dockerfile
@@ -23,7 +23,7 @@ jobs:
           wget http://localhost:9001/healthy || exit 1
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: latest
 
