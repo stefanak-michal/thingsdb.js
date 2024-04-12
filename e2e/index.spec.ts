@@ -12,7 +12,9 @@ test('perform ThingsDB test', async ({ page }) => {
     });
     expect(connected).toBeTruthy();
 
-    const ping = await page.evaluate(() => window["thingsdb"].ping())
-    expect(ping).toBeTruthy();
+    await page.evaluate(() => window["thingsdb"].ping())
+    await page.evaluate(() => window["thingsdb"].auth())
 
+    const hello = await page.evaluate(() => window["thingsdb"].query('@thingsdb', '"Hello World!"'));
+    expect(hello).toBe('Hello World!');
 });
