@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import ThingsDB from "../src/ThingsDB";
 
 test('perform ThingsDB test', async ({ page }) => {
     await page.goto('http://localhost:9000/');
@@ -8,8 +7,12 @@ test('perform ThingsDB test', async ({ page }) => {
     await expect(page).toHaveTitle("ThingsDB.js");
 
     const connected = await page.evaluate(() => {
-        var thingsdb = new ThingsDB();
-        return thingsdb.connect();
+        window["thingsdb"] = new window["ThingsDB"]();
+        return window["thingsdb"].connect();
     });
     expect(connected).toBeTruthy();
+
+    const ping = await page.evaluate(() => window["thingsdb"].ping())
+    expect(ping).toBeTruthy();
+
 });
