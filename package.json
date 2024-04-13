@@ -30,7 +30,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/stefanak-michal/thingsdb.js.git"
+    "url": "git+https://github.com/stefanak-michal/thingsdb.js.git"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.1",
