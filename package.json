@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Javascript connector for ThingsDB",
   "homepage": "https://github.com/stefanak-michal/thingsdb.js",
-  "private": true,
+  "private": false,
   "main": "dist/thingsdb.js",
   "scripts": {
     "test": "jest ./test",
