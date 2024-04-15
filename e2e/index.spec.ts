@@ -6,11 +6,10 @@ test('perform ThingsDB test', async ({ page }) => {
     // Expect a title "to contain" a substring.
     await expect(page).toHaveTitle("ThingsDB.js");
 
-    const connected = await page.evaluate(() => {
+    await page.evaluate(() => {
         window["thingsdb"] = new window["ThingsDB"]();
         return window["thingsdb"].connect();
     });
-    expect(connected).toBeTruthy();
 
     await page.evaluate(() => window["thingsdb"].ping())
     await page.evaluate(() => window["thingsdb"].auth())

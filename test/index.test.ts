@@ -48,15 +48,14 @@ describe('auth required', () => {
         });
 
         test('join non existing rooms', async () => {
+            await thingsdb.query('@:stuff', 'if (.has("test_room")) .del("test_room");');
             await expect(thingsdb.join('@:stuff', 5, 6)).resolves.toStrictEqual([null, null]);
         });
 
         describe('room', () => {
             let roomId: number;
             beforeAll(async () => {
-                roomId = await thingsdb.query('@:stuff', `if (.has("test_room")) .del("test_room");
-.test_room = room();
-.test_room.id();`);
+                roomId = await thingsdb.query('@:stuff', '.test_room = room(); .test_room.id();');
             });
 
             test('join', async () => {
@@ -130,6 +129,6 @@ describe('auth required', () => {
     });
 
     afterAll(() => {
-        thingsdb.disconnect();
-    })
+        return thingsdb.disconnect();
+    });
 });

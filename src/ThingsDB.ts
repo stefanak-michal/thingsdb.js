@@ -2,27 +2,49 @@ import { encode, decode } from "messagepack";
 import EventType from "./EventType";
 const WebSocketClient = require('websocket').w3cwebsocket;
 
+/**
+ * Class ThingsDB
+ * @author Michal Stefanak
+ * @link https://github.com/stefanak-michal/thingsdb.js/
+ */
 class ThingsDB {
     private ws: typeof WebSocketClient;
     private id: number = 1;
     private readonly uri: string;
     private pending: { [index: number]: { resolve: (value: any) => void, reject: (value: any) => void }} = {};
-    private listeners: ((type: number, message: any) => void)[] = [];
+    private listeners = new Set<(type: number, message: any) => void>();
+    private closePromise: any[] = [];
 
     constructor(uri: string = 'ws://127.0.0.1:7681') {
         this.uri = uri;
     }
 
-    public connect() {
+    /**
+     * Initialize websocket connection
+     */
+    public connect(): Promise<void> {
         return new Promise((resolve, reject) => {
             this.ws = new WebSocketClient(this.uri);
             this.ws.binaryType = "arraybuffer";
 
-            this.ws.onopen = (event: Event) => {
-                resolve(true);
+            this.ws.onopen = () => {
+                // on successful connection update onerror action
+                this.ws.onerror = (event: ErrorEvent) => {
+                    if (this.closePromise.length) {
+                        this.closePromise[1](event);
+                        this.closePromise = [];
+                    } else {
+                        throw event;
+                    }
+                }
+                resolve();
             }
 
             this.ws.onclose = (event: CloseEvent) => {
+                if (this.closePromise.length) {
+                    this.closePromise[0](event);
+                    this.closePromise = [];
+                }
             }
 
             this.ws.onmessage = (event: MessageEvent) => {
@@ -47,21 +69,143 @@ class ThingsDB {
                     else this.pending[id].resolve(message);
                     delete this.pending[id];
                 } else if (type in EventType) {
-                    for (const callback of this.listeners) callback(type as EventType, message);
+                    this.listeners.forEach(callback => {
+                        callback(type as EventType, message);
+                    });
                 } else {
                     console.error("Unregistered event type: ", type);
                 }
             }
 
             this.ws.onerror = (event: ErrorEvent) => {
-                console.error("WebSocket error: ", event);
                 reject(event);
             }
         })
     }
 
-    public disconnect(): void {
-        this.ws.close();
+    /**
+     * Terminate websocket connection
+     */
+    public disconnect(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.closePromise = [resolve, reject];
+            this.ws.close();
+        })
+    }
+
+    /**
+     * Authenticate user with credentials
+     * @link https://docs.thingsdb.io/v1/connect/socket/auth/
+     * @param username
+     * @param password
+     */
+    public auth(username: string = 'admin', password: string = 'pass'): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(33, [username, password])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    /**
+     * Authenticate user with token
+     * @link https://docs.thingsdb.io/v1/connect/socket/auth/
+     * @param token
+     */
+    public authToken(token: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(33, token)] = { resolve: resolve, reject: reject };
+        })
+    }
+
+    /**
+     * Send a ping request - Can be used as keep-alive
+     * @link https://docs.thingsdb.io/v1/connect/socket/ping/
+     */
+    public ping(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(32)] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    /**
+     * Send a query request - Query ThingsDB
+     * @link https://docs.thingsdb.io/v1/connect/socket/query/
+     * @param scope
+     * @param code
+     * @param vars
+     */
+    public query(scope: string, code: string, vars?: {}): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(34, [scope, code, vars])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    /**
+     * Send a run request - Run a procedure in ThingsDB
+     * @link https://docs.thingsdb.io/v1/connect/socket/run/
+     * @param scope
+     * @param procedure
+     * @param args
+     */
+    public run(scope: string, procedure: string, args?: any[]): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(37, [scope, procedure, args])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    /**
+     * Send a join request - Join one or more rooms in a collection
+     * @link https://docs.thingsdb.io/v1/connect/socket/join/
+     * @param scope
+     * @param ids
+     */
+    public join(scope: string, ...ids: number[]): Promise<(number|null)[]> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(38, [scope, ...ids])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    /**
+     * Send a leave request - Leave one or more joined rooms
+     * @link https://docs.thingsdb.io/v1/connect/socket/leave/
+     * @param scope
+     * @param ids
+     */
+    public leave(scope: string, ...ids: number[]): Promise<(number|null)[]> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(39, [scope, ...ids])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    /**
+     * Send a emit request - Emit an event to a room in a collection
+     * @link https://docs.thingsdb.io/v1/connect/socket/emit/
+     * @param scope
+     * @param roomId
+     * @param event
+     * @param args
+     */
+    public emit(scope: string, roomId: number, event: string, args: any[] = []): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(40, [scope, roomId, event, ...args])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    /**
+     * Add listener for emitted packages in joined rooms
+     * @link https://docs.thingsdb.io/v1/listening/
+     * @param callback
+     */
+    public addEventListener(callback: (type: EventType, message: any) => void): void {
+        this.removeEventListener(callback);
+        this.listeners.add(callback);
+    }
+
+    /**
+     * Remove listener
+     * @param callback
+     */
+    public removeEventListener(callback: (type: EventType, message: any) => void): void {
+        this.listeners.delete(callback);
     }
 
     private getNextId(): number {
@@ -70,63 +214,6 @@ class ThingsDB {
             this.id = 1;
         }
         return id;
-    }
-
-    public auth(username: string = 'admin', password: string = 'pass'): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.pending[this.send(33, [username, password])] = { resolve: resolve, reject: reject };
-        });
-    }
-
-    public authToken(token: string): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.pending[this.send(33, token)] = { resolve: resolve, reject: reject };
-        })
-    }
-
-    public ping(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.pending[this.send(32)] = { resolve: resolve, reject: reject };
-        });
-    }
-
-    public query(scope: string, code: string, vars?: {}): Promise<any> {
-        return new Promise((resolve, reject) => {
-            this.pending[this.send(34, [scope, code, vars])] = { resolve: resolve, reject: reject };
-        });
-    }
-
-    public run(scope: string, procedure: string, args?: any[]): Promise<any> {
-        return new Promise((resolve, reject) => {
-            this.pending[this.send(37, [scope, procedure, args])] = { resolve: resolve, reject: reject };
-        });
-    }
-
-    public join(scope: string, ...ids: number[]): Promise<(number|null)[]> {
-        return new Promise((resolve, reject) => {
-            this.pending[this.send(38, [scope, ...ids])] = { resolve: resolve, reject: reject };
-        });
-    }
-
-    public leave(scope: string, ...ids: number[]): Promise<(number|null)[]> {
-        return new Promise((resolve, reject) => {
-            this.pending[this.send(39, [scope, ...ids])] = { resolve: resolve, reject: reject };
-        });
-    }
-
-    public emit(scope: string, roomId: number, event: string, args: any[] = []): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.pending[this.send(40, [scope, roomId, event, ...args])] = { resolve: resolve, reject: reject };
-        });
-    }
-
-    public addEventListener(callback: (type: EventType, message: any) => void): void {
-        this.listeners.push(callback);
-    }
-
-    public removeEventListener(callback: (type: EventType, message: any) => void): void {
-        const i = this.listeners.indexOf(callback);
-        if (i >= 0) this.listeners.splice(i, 1);
     }
 
     private send(type: number, data: any = "") {
@@ -148,7 +235,6 @@ class ThingsDB {
         view.setUint8(6, type);
         view.setUint8(7, ~type);
 
-        // console.log("WebSocket send: ", buffer);
         this.ws.send(buffer);
 
         return id;
