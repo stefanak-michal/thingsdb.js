@@ -7,8 +7,8 @@
   "main": "dist/thingsdb.js",
   "scripts": {
     "test": "jest ./test",
-    "build": "webpack --mode=production",
-    "dev": "webpack --mode=development",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development",
     "start": "webpack-dev-server --mode development",
     "playwright": "npx playwright test"
   },
