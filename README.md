@@ -82,7 +82,7 @@ _Also available as enum EventType for typescript._
 const thingsdb = new ThingsDB();
 thingsdb.connect().then(() => {
     thingsdb.auth().then(() => {
-        thingsdb.query('@:stuff', 'Hello World!').then(response => {
+        thingsdb.query('@:stuff', '"Hello World!";').then(response => {
             console.log(response); // will be "Hello World!"
         });
     });

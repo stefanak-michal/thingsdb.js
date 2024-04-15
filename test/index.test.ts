@@ -19,7 +19,7 @@ describe('auth required', () => {
     });
 
     test('query', async () => {
-        await expect(thingsdb.query('@thingsdb', '"Hello World!"')).resolves.toBe('Hello World!');
+        await expect(thingsdb.query('@thingsdb', '"Hello World!";')).resolves.toBe('Hello World!');
     });
 
     test('query with arguments', async () => {

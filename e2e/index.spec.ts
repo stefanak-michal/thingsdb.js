@@ -14,7 +14,7 @@ test('perform ThingsDB test', async ({ page }) => {
     await page.evaluate(() => window["thingsdb"].ping())
     await page.evaluate(() => window["thingsdb"].auth())
 
-    const hello = await page.evaluate(() => window["thingsdb"].query('@thingsdb', '"Hello World!"'));
+    const hello = await page.evaluate(() => window["thingsdb"].query('@thingsdb', '"Hello World!";'));
     expect(hello).toBe('Hello World!');
 
     const roomId = await page.evaluate(() => window["thingsdb"].query('@:stuff', `if (.has("test_room")) .del("test_room");
