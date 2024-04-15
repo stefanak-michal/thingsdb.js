@@ -13,22 +13,38 @@ class ThingsDB {
     private readonly uri: string;
     private pending: { [index: number]: { resolve: (value: any) => void, reject: (value: any) => void }} = {};
     private listeners = new Set<(type: number, message: any) => void>();
+    private closePromise: any[] = [];
 
     constructor(uri: string = 'ws://127.0.0.1:7681') {
         this.uri = uri;
     }
 
+    /**
+     * Initialize websocket connection
+     */
     public connect(): Promise<void> {
         return new Promise((resolve, reject) => {
             this.ws = new WebSocketClient(this.uri);
             this.ws.binaryType = "arraybuffer";
 
-            this.ws.onopen = (event: Event) => {
+            this.ws.onopen = () => {
+                // on successful connection update onerror action
+                this.ws.onerror = (event: ErrorEvent) => {
+                    if (this.closePromise.length) {
+                        this.closePromise[1](event);
+                        this.closePromise = [];
+                    } else {
+                        throw event;
+                    }
+                }
                 resolve();
             }
 
             this.ws.onclose = (event: CloseEvent) => {
-                console.log("Websocket connection closed");
+                if (this.closePromise.length) {
+                    this.closePromise[0](event);
+                    this.closePromise = [];
+                }
             }
 
             this.ws.onmessage = (event: MessageEvent) => {
@@ -62,22 +78,19 @@ class ThingsDB {
             }
 
             this.ws.onerror = (event: ErrorEvent) => {
-                console.error("WebSocket error: ", event);
                 reject(event);
             }
         })
     }
 
-    public disconnect(): void {
-        this.ws.close();
-    }
-
-    private getNextId(): number {
-        const id = this.id++;
-        if (this.id > 65535) {
-            this.id = 1;
-        }
-        return id;
+    /**
+     * Terminate websocket connection
+     */
+    public disconnect(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.closePromise = [resolve, reject];
+            this.ws.close();
+        })
     }
 
     /**
@@ -193,6 +206,14 @@ class ThingsDB {
      */
     public removeEventListener(callback: (type: EventType, message: any) => void): void {
         this.listeners.delete(callback);
+    }
+
+    private getNextId(): number {
+        const id = this.id++;
+        if (this.id > 65535) {
+            this.id = 1;
+        }
+        return id;
     }
 
     private send(type: number, data: any = "") {
