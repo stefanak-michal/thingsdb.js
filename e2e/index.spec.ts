@@ -7,7 +7,7 @@ test('perform ThingsDB test', async ({ page }) => {
     await expect(page).toHaveTitle("ThingsDB.js");
 
     await page.evaluate(() => {
-        window["thingsdb"] = new window["ThingsDB"]();
+        window["thingsdb"] = new window["ThingsDB"]('ws://thingsdb:7681');
         return window["thingsdb"].connect();
     });
 
