@@ -44,3 +44,5 @@ jobs:
 
       - name: Run Playwright tests
         run: npm run playwright
+        env:
+          HOME: /root
