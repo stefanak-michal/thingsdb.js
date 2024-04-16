@@ -10,17 +10,24 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Jest tests
 
+    services:
+      thingsdb:
+        image: ghcr.io/thingsdb/node:latest
+        env:
+          THINGSDB_INIT: 1
+          THINGSDB_LISTEN_CLIENT_PORT: 9200
+          THINGSDB_HTTP_STATUS_PORT: 9001
+          THINGSDB_WS_PORT: 7681
+        ports:
+          - 9200:9200
+          - 9001:9001
+          - 7681:7681
+        options: >-
+          --health-cmd "wget http://localhost:9001/healthy || exit 1"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Docker build
-        run: docker build -t thingsdb . -f ci/thingsdb.Dockerfile
-
-      - name: Docker run
-        run: |
-          docker run --name thingsdb -d -p 9200:9200 -p 9001:9001 -p 7681:7681 thingsdb
-          wget http://localhost:9001/healthy || exit 1
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -31,4 +38,4 @@ jobs:
         run: npm ci
 
       - name: jest run test
-        run: npm test
+        run: npm run test
