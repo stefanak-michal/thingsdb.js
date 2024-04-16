@@ -3,7 +3,7 @@ import { jest, expect, test, beforeAll, describe, afterAll } from '@jest/globals
 import waitForExpect from "wait-for-expect";
 import EventType from "../src/EventType";
 
-const thingsdb = new ThingsDB();
+const thingsdb = new ThingsDB(process.env.URL || 'ws://127.0.0.1:9270');
 
 beforeAll(() => {
     return thingsdb.connect();

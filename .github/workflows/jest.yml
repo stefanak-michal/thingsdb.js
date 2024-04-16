@@ -17,11 +17,11 @@ jobs:
           THINGSDB_INIT: 1
           THINGSDB_LISTEN_CLIENT_PORT: 9200
           THINGSDB_HTTP_STATUS_PORT: 9001
-          THINGSDB_WS_PORT: 7681
+          THINGSDB_WS_PORT: 9270
         ports:
           - 9200:9200
           - 9001:9001
-          - 7681:7681
+          - 9270:9270
         options: >-
           --health-cmd "wget http://localhost:9001/healthy || exit 1"
 

@@ -15,7 +15,7 @@ class ThingsDB {
     private listeners = new Set<(type: number, message: any) => void>();
     private closePromise: any[] = [];
 
-    constructor(uri: string = 'ws://127.0.0.1:7681') {
+    constructor(uri: string = 'ws://127.0.0.1:9270') {
         this.uri = uri;
     }
 
