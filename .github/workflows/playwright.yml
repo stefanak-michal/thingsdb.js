@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Playwright tests
     container:
-      image: mcr.microsoft.com/playwright:latest
+      image: mcr.microsoft.com/playwright:v1.43.0-jammy
 
     services:
       thingsdb:
