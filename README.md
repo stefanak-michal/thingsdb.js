@@ -1,13 +1,14 @@
 # ThingsDB.js
 
-![Github stargazers](https://img.shields.io/github/stars/stefanak-michal/thingsdb.js)
-![NPM Downloads](https://img.shields.io/npm/dm/thingsdb.js)
-![GitHub Release](https://img.shields.io/github/v/release/stefanak-michal/thingsdb.js)
-![GitHub commits since latest release](https://img.shields.io/github/commits-since/stefanak-michal/thingsdb.js/latest)
 
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/stefanak-michal/thingsdb.js/.github%2Fworkflows%2Fjest.yml?label=Jest)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/stefanak-michal/thingsdb.js/.github%2Fworkflows%2Fplaywright.yml?label=Playwright)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/stefanak-michal/thingsdb.js/.github%2Fworkflows%2Fnpm-publish.yml?label=npm%20publish)
+[![Github stargazers](https://img.shields.io/github/stars/stefanak-michal/thingsdb.js)](https://github.com/stefanak-michal/thingsdb.js/stargazers)
+[![NPM Downloads](https://img.shields.io/npm/dm/thingsdb.js)](https://www.npmjs.com/package/thingsdb.js)
+[![GitHub Release](https://img.shields.io/github/v/release/stefanak-michal/thingsdb.js)](https://github.com/stefanak-michal/thingsdb.js/releases/latest)
+[![GitHub commits since latest release](https://img.shields.io/github/commits-since/stefanak-michal/thingsdb.js/latest)](https://github.com/stefanak-michal/thingsdb.js/releases/latest)
+
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/stefanak-michal/thingsdb.js/.github%2Fworkflows%2Fjest.yml?label=Jest)](https://github.com/stefanak-michal/thingsdb.js/actions/workflows/jest.yml)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/stefanak-michal/thingsdb.js/.github%2Fworkflows%2Fplaywright.yml?label=Playwright)](https://github.com/stefanak-michal/thingsdb.js/actions/workflows/playwright.yml)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/stefanak-michal/thingsdb.js/.github%2Fworkflows%2Fnpm-publish.yml?label=npm%20publish)](https://github.com/stefanak-michal/thingsdb.js/actions/workflows/npm-publish.yml)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z5ABMLW)
 
