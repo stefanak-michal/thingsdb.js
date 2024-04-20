@@ -17,7 +17,7 @@ jobs:
       - run: npm ci
 
       - name: Update package version
-        run: npm version ${{ github.ref }} --allow-same-version
+        run: npm version ${{ github.ref_name }} --allow-same-version
 
       - name: Build
         run: npm run build
