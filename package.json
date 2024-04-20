@@ -14,7 +14,10 @@
   },
   "keywords": [
     "ThingsDB",
-    "javascript"
+    "javascript",
+    "websocket",
+    "database",
+    "connectivity"
   ],
   "author": "Michal Stefanak (https://www.linkedin.com/in/michalstefanak/)",
   "funding": [
