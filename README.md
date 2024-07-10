@@ -19,7 +19,7 @@ and frontend environments. It simplifies data access, manipulation, and querying
 
 ## :white_check_mark: Requirements
 
-- ThingsDB [v1.6.0](https://docs.thingsdb.io/v1/)
+- ThingsDB [v1](https://docs.thingsdb.io/v1/)
 - Javascript
 
 ## :floppy_disk: Instalation
@@ -52,21 +52,21 @@ Every method has comment (annotation) with required information and link to docu
 
 ### Available methods
 
-| Method              | Description                                                                   | Returns                                                                                                                                                      |
-|---------------------|-------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| __construct         | ThingsDB constructor                                                          | ThingsDB instance                                                                                                                                            |
-| connect             | Initialize websocket connection                                               | `Promise<void>`                                                                                                                                              |
-| disconnect          | Close websocket connection                                                    | `Promise<void>`                                                                                                                                              |
-| ping                | Ping, useful as keep-alive                                                    | `Promise<void>`                                                                                                                                              |
-| auth                | Authorization with username and password                                      | `Promise<void>`                                                                                                                                              |
-| authToken           | Authorization with token                                                      | `Promise<void>`                                                                                                                                              |
-| query               | Query ThingsDB                                                                | `Promise<any>`                                                                                                                                               |
-| run                 | Run a procedure                                                               | `Promise<any>`                                                                                                                                               |
-| join                | Join one or more room(s)                                                      | `Promise<(number\|null)[]>` - Array as requested ids to connect. Successful join returns same id at the same index. Unsuccessful returns null at that index. |
-| leave               | Leave one or more room(s)                                                     | `Promise<(number\|null)[]>` - Same as join.                                                                                                                  |
-| emit                | Emit an event to a room                                                       | `Promise<void>`                                                                                                                                              |
-| addEventListener    | Add listener for events - callback: `(type: EventType, message: any) => void` | `void`                                                                                                                                                       |
-| removeEventListener | Remove listener for events                                                    | `void`                                                                                                                                                       |
+| Method              | Arguments                                                      | Description                              | Returns                                                                                                                                                      |
+|---------------------|----------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| __construct         |                                                                | ThingsDB constructor                     | ThingsDB instance                                                                                                                                            |
+| connect             |                                                                | Initialize websocket connection          | `Promise<void>`                                                                                                                                              |
+| disconnect          |                                                                | Close websocket connection               | `Promise<void>`                                                                                                                                              |
+| ping                |                                                                | Ping, useful as keep-alive               | `Promise<void>`                                                                                                                                              |
+| auth                | username: string = 'admin', password: string = 'pass'          | Authorization with username and password | `Promise<void>`                                                                                                                                              |
+| authToken           | token: string                                                  | Authorization with token                 | `Promise<void>`                                                                                                                                              |
+| query               | scope: string, code: string, vars?: {}                         | Query ThingsDB                           | `Promise<any>`                                                                                                                                               |
+| run                 | scope: string, procedure: string, args?: any[]                 | Run a procedure                          | `Promise<any>`                                                                                                                                               |
+| join                | scope: string, ...ids: number[]                                | Join one or more room(s)                 | `Promise<(number\|null)[]>` - Array as requested ids to connect. Successful join returns same id at the same index. Unsuccessful returns null at that index. |
+| leave               | scope: string, ...ids: number[]                                | Leave one or more room(s)                | `Promise<(number\|null)[]>` - Same as join.                                                                                                                  |
+| emit                | scope: string, roomId: number, event: string, args: any[] = [] | Emit an event to a room                  | `Promise<void>`                                                                                                                                              |
+| addEventListener    | callback: (type: EventType, message: any) => void              | Add listener for events                  | `void`                                                                                                                                                       |
+| removeEventListener | callback: (type: EventType, message: any) => void              | Remove listener for events               | `void`                                                                                                                                                       |
 
 ### Listening
 
