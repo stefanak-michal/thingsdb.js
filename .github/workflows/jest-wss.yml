@@ -25,13 +25,13 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: latest
+          node-version: 'lts/*'
 
       - name: npm install
         run: npm ci
 
       - name: jest run test
         env:
-          URL: wss://127.0.0.1:9270
+          URL: 'wss://127.0.0.1:9270'
           NODE_TLS_REJECT_UNAUTHORIZED: 0
         run: npm run test
