@@ -19,7 +19,7 @@ and frontend environments. It simplifies data access, manipulation, and querying
 
 ## :white_check_mark: Requirements
 
-- ThingsDB [v1](https://docs.thingsdb.io/v1/)
+- ThingsDB [^1.6](https://docs.thingsdb.io/v1/)
 - Javascript
 
 ## :floppy_disk: Instalation
