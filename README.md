@@ -19,7 +19,7 @@ and frontend environments. It simplifies data access, manipulation, and querying
 
 ## :white_check_mark: Requirements
 
-- ThingsDB [^1.6](https://docs.thingsdb.io/v1/)
+- ThingsDB [v1](https://docs.thingsdb.io/v1/) with enabled [websocket](https://docs.thingsdb.io/v1/connect/websocket/)
 - Javascript
 
 ## :floppy_disk: Instalation
@@ -54,7 +54,7 @@ Every method has comment (annotation) with required information and link to docu
 
 | Method              | Arguments                                                      | Description                              | Returns                                                                                                                                                      |
 |---------------------|----------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| __construct         |                                                                | ThingsDB constructor                     | ThingsDB instance                                                                                                                                            |
+| __construct         | uri: string = 'ws://127.0.0.1:9270'                            | ThingsDB constructor                     | ThingsDB instance                                                                                                                                            |
 | connect             |                                                                | Initialize websocket connection          | `Promise<void>`                                                                                                                                              |
 | disconnect          |                                                                | Close websocket connection               | `Promise<void>`                                                                                                                                              |
 | ping                |                                                                | Ping, useful as keep-alive               | `Promise<void>`                                                                                                                                              |
