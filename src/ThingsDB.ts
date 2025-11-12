@@ -191,6 +191,21 @@ class ThingsDB {
     }
 
     /**
+     * Send a emit to peers request - Emit an event to the peers in a room (no echo back)
+     * @link https://docs.thingsdb.io/v1/connect/socket/emit/
+     * @param scope
+     * @param roomId
+     * @param event
+     * @param args
+     * @since ThingsDB v1.8.0
+     */
+    public emitPeers(scope: string, roomId: number, event: string, args: any[] = []): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.pending[this.send(41, [scope, roomId, event, ...args])] = { resolve: resolve, reject: reject };
+        });
+    }
+
+    /**
      * Add listener for emitted packages in joined rooms
      * @link https://docs.thingsdb.io/v1/listening/
      * @param callback

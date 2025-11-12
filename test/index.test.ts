@@ -89,6 +89,26 @@ describe('auth required', () => {
                 });
             });
 
+            test('emitPeers', async () => {
+                const fn = jest.fn((type: number, message: any): void => {
+                    // Should not receive echo back when using emitPeers
+                    expect(type).toBe(EventType.ON_EMIT);
+                    throw new Error('Should not receive echo back from emitPeers');
+                });
+
+                thingsdb.addEventListener(fn);
+                // emitPeers should not echo back to this connection
+                await thingsdb.emitPeers('@:stuff', roomId, 'test-peers-message');
+                await thingsdb.emitPeers('@:stuff', roomId, 'test-peers-with-args', [99, 'world']);
+                
+                // Wait a short time to ensure no event is received
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Verify no events were received
+                expect(fn).toBeCalledTimes(0);
+                thingsdb.removeEventListener(fn);
+            });
+
             test('wait for emit', async () => {
                 const fn = jest.fn((type: number, message: any): void => {
                     expect(type).toBe(EventType.ON_EMIT);
