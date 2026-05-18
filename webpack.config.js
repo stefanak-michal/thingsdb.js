@@ -1,4 +1,37 @@
 const path = require('path');
+const { generateDtsBundle } = require('dts-bundle-generator');
+const fs = require('fs');
+
+class DtsBundlePlugin {
+    apply(compiler) {
+        compiler.hooks.afterEmit.tap('DtsBundlePlugin', (compilation) => {
+            try {
+                const result = generateDtsBundle(
+                    [{
+                        filePath: './src/ThingsDB.ts',
+                        libraries: {
+                            importedLibraries: [],
+                            inlinedLibraries: [],
+                        },
+                    }],
+                    { preferredConfigPath: './tsconfig.json' }
+                );
+
+                if (!Array.isArray(result) || result.length === 0 || typeof result[0] !== 'string') {
+                    throw new Error('generateDtsBundle did not produce a declaration bundle.');
+                }
+
+                fs.mkdirSync('./dist', { recursive: true });
+                fs.writeFileSync('./dist/thingsdb.d.ts', result[0]);
+            } catch (error) {
+                const pluginError = error instanceof Error
+                    ? new Error(`DtsBundlePlugin failed: ${error.message}`)
+                    : new Error(`DtsBundlePlugin failed: ${String(error)}`);
+                compilation.errors.push(pluginError);
+            }
+        });
+    }
+}
 
 // Webpack Configuration
 const config = {
@@ -16,20 +49,14 @@ const config = {
             {
                 test: /\.(js|ts)$/,
                 exclude: /node_modules/,
-                loader: 'babel-loader',
+                loader: 'ts-loader',
             }
         ]
     },
     resolve: {
         extensions: ['.ts', '.js'],
     },
-    devServer: {
-        compress: true,
-        hot: true,
-        open: true,
-        port: 9000
-    },
-    plugins: [],
+    plugins: [new DtsBundlePlugin()],
 };
 
 module.exports = config;
