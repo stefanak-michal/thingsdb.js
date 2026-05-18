@@ -45,6 +45,8 @@ Run this command to install package into your project:
 
 `npm i thingsdb.js`
 
+TypeScript definitions are included automatically through `dist/thingsdb.d.ts`.
+
 ## :desktop_computer: Usage
 
 Class `ThingsDB` provide all functionality related to websocket connection with ThingsDB. It contains set of method which are based on documentation.
