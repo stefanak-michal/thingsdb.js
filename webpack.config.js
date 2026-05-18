@@ -15,6 +15,7 @@ class DtsBundlePlugin {
                 }],
                 { preferredConfigPath: './tsconfig.json' }
             );
+            fs.mkdirSync('./dist', { recursive: true });
             fs.writeFileSync('./dist/thingsdb.d.ts', result[0]);
         });
     }

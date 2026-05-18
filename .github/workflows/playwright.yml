@@ -44,6 +44,12 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Build
+        run: npm run build
+
+      - name: Copy index.html to dist
+        run: cp public/index.html dist/
+
       - name: Run Playwright tests
         run: npm run playwright
         env:
