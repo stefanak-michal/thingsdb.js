@@ -5,11 +5,11 @@
   "homepage": "https://github.com/stefanak-michal/thingsdb.js",
   "private": false,
   "main": "dist/thingsdb.js",
-  "types": "dist/ThingsDB.d.ts",
+  "types": "dist/thingsdb.d.ts",
   "scripts": {
     "test": "jest ./test",
     "build": "webpack --mode production && npm run build:types",
-    "build:types": "tsc --project tsconfig.types.json",
+    "build:types": "tsc --project tsconfig.types.json && mv dist/ThingsDB.d.ts dist/thingsdb.d.ts",
     "dev": "webpack --mode development",
     "start": "webpack-dev-server --mode development",
     "playwright": "npx playwright test"
