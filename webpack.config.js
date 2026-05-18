@@ -1,4 +1,24 @@
 const path = require('path');
+const { generateDtsBundle } = require('dts-bundle-generator');
+const fs = require('fs');
+
+class DtsBundlePlugin {
+    apply(compiler) {
+        compiler.hooks.afterEmit.tap('DtsBundlePlugin', () => {
+            const result = generateDtsBundle(
+                [{
+                    filePath: './src/ThingsDB.ts',
+                    libraries: {
+                        importedLibraries: [],
+                        inlinedLibraries: [],
+                    },
+                }],
+                { preferredConfigPath: './tsconfig.json' }
+            );
+            fs.writeFileSync('./dist/thingsdb.d.ts', result[0]);
+        });
+    }
+}
 
 // Webpack Configuration
 const config = {
@@ -16,7 +36,7 @@ const config = {
             {
                 test: /\.(js|ts)$/,
                 exclude: /node_modules/,
-                loader: 'babel-loader',
+                loader: 'ts-loader',
             }
         ]
     },
@@ -29,7 +49,7 @@ const config = {
         open: true,
         port: 9000
     },
-    plugins: [],
+    plugins: [new DtsBundlePlugin()],
 };
 
 module.exports = config;
