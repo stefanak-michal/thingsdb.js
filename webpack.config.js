@@ -44,12 +44,6 @@ const config = {
     resolve: {
         extensions: ['.ts', '.js'],
     },
-    devServer: {
-        compress: true,
-        hot: true,
-        open: true,
-        port: 9000
-    },
     plugins: [new DtsBundlePlugin()],
 };
 

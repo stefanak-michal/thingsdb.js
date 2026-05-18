@@ -15,7 +15,6 @@
     "test": "jest ./test",
     "build": "webpack --mode production",
     "dev": "webpack --mode development",
-    "start": "npx serve dist --listen 9000 --no-clipboard",
     "playwright": "npx playwright test"
   },
   "keywords": [
