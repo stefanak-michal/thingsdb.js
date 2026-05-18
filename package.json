@@ -5,7 +5,7 @@
   "homepage": "https://github.com/stefanak-michal/thingsdb.js",
   "private": false,
   "main": "dist/thingsdb.js",
-  "types": "dist/thingsdb.d.ts",
+  "types": "dist/ThingsDB.d.ts",
   "scripts": {
     "test": "jest ./test",
     "build": "webpack --mode production && npm run build:types",
