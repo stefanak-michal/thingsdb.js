@@ -1,4 +1,4 @@
-import ThingsDB from '../src/ThingsDB';
+import ThingsDB from '../src/thingsdb';
 import { jest, expect, test, beforeAll, describe, afterAll } from '@jest/globals';
 import waitForExpect from "wait-for-expect";
 import EventType from "../src/EventType";

@@ -9,7 +9,7 @@
   "scripts": {
     "test": "jest ./test",
     "build": "webpack --mode production && npm run build:types",
-    "build:types": "tsc --project tsconfig.types.json && mv dist/ThingsDB.d.ts dist/thingsdb.d.ts",
+    "build:types": "tsc --project tsconfig.types.json",
     "dev": "webpack --mode development",
     "start": "webpack-dev-server --mode development",
     "playwright": "npx playwright test"

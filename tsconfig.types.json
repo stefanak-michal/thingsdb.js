@@ -4,11 +4,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "skipLibCheck": true,
-    "ignoreDeprecations": "6.0",
-    "strict": false,
-    "types": ["node"]
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts"
